@@ -19,10 +19,21 @@ public class Main {
                 return o1.getAge() - o2.getAge();
             }
         });
+        System.out.println("truoc khi delete");
         for(Student x : list){
             System.out.println(x);
         }
-
+        deleteById(1);
+        List<Student> list1 = getAllStudent();
+        System.out.println("sau khi xoa id = 1");
+        for(Student y : list1){
+            System.out.println(y);
+        }
+        updateInfoStudent(4, "duy tam", 22);
+        List<Student> list2 = getAllStudent();
+        for(Student x : list2){
+            System.out.println(x);
+        }
     }
     public static List<Student> getAllStudent(){
         List<Student> list = new ArrayList<>();
@@ -117,16 +128,89 @@ public class Main {
                     ex.printStackTrace();
                 }
             }
-            try {
-                connection.close();
-                assert preparedStatement != null;
-                preparedStatement.close();
+            finally {
+                try {
+                    connection.close();
+                    assert preparedStatement != null;
+                    preparedStatement.close();
 
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
+    public static void deleteById(int id){
+        String sqlQuery = "DELETE FROM student WHERE id = ?";
+        Connection connection = TestConnectDB.getConnection();
+        PreparedStatement preparedStatement = null;
+        if(connection != null){
+            if(findAStudentById(id) != null){
+                try {
+                    preparedStatement = connection.prepareStatement(sqlQuery);
+                    connection.setAutoCommit(false);
+                    preparedStatement.setInt(1,id);
+                    preparedStatement.executeUpdate();
+                    connection.commit();
+                } catch (SQLException e) {
+                    try {
+                        connection.rollback();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                finally {
+                    try {
+                        connection.close();
+                        assert preparedStatement != null;
+                        preparedStatement.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            else{
+                System.out.println("Id khong hop le");
+            }
+        }
+    }
+    public static void updateInfoStudent(int id, String name, int age){
+        String sqlQuery = "UPDATE student SET ten = ?, tuoi = ? WHERE id = ?";
+        Connection connection = TestConnectDB.getConnection();
+        PreparedStatement preparedStatement = null;
+        if(connection != null){
+            if(findAStudentById(id) != null){
+                try {
+                    preparedStatement = connection.prepareStatement(sqlQuery);
+                    connection.setAutoCommit(false);
+                    preparedStatement.setString(1, name);
+                    preparedStatement.setInt(2, age);
+                    preparedStatement.setInt(3, id);
+                    preparedStatement.executeUpdate();
+                    connection.commit();
+                } catch (SQLException e) {
+                    try {
+                        connection.rollback();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+                finally {
+                    try {
+                        connection.close();
+                        assert preparedStatement != null;
+                        preparedStatement.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            else{
+                System.out.println("Id khong hop le");
+            }
+        }
+    }
+
     
     
 }
